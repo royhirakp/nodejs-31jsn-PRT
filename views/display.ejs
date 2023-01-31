@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        td{
+            border: 1px solid;
+        }
+
+    </style>
+    
+
+    <table>
+        <h1>Inventory Type</h1>
+        <thead>
+            <tr>
+                <th>Inventory_id</th>
+                <th>Inventory tYPE</th>
+                <th>Item Name</th>
+                <th>Available_Quantity</th>
+            </tr>
+           
+
+        </thead>
+        <tbody>
+            <tr>
+                <td>55</td>
+                <td>55</td>
+                <td>55</td>
+                <td>55</td>
+            </tr>
+            <% inventor?.forEach((item,i)=>{ %>
+                <tr key='<%= i %>'>                    
+                    <td><%= item._id %></td>
+                    <td><%= item.inventory_type %></td>
+                    <td><%= item.item_name %></td>
+                    <td><%= item.available_quantity %></td>
+                    </tr>
+                <% }) %>          
+
+
+        </tbody>
+    </table>
+
+    <table>
+        <h1>coustomer Table</h1>
+        <thead>
+            <tr>
+                <th>Coustomer_Id</th>
+                <th>Customer NAME</th>
+                <th>Email</th>
+                
+            </tr>
+           
+
+        </thead>
+        <tbody>
+            <% Coustomer?.forEach((item,i)=>{ %>
+                <tr key='<%= i %>'>                    
+                    <td><%= item._id %></td>
+                    <td><%= item.customer_Name %></td>
+                    <td><%= item.email %></td>
+                  
+                    </tr>
+                <% }) %>          
+
+
+        </tbody>
+    </table>
+
+    <table>
+        <h1>Order Table</h1>
+        <thead>
+            <tr>
+                <th>Coustomer_Id</th>
+                <th>Inventory_id</th>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                
+            </tr>
+           
+
+        </thead>
+        <tbody>
+            <% Order?.forEach((item,i)=>{ %>
+                <tr key='<%= i %>'>                    
+                    <td><%= item.coustomer_Id %></td>
+                    <td><%= item.inventory_id %></td>
+                    <td><%= item.item_name %></td> 
+                    <td><%= item.Quantity %></td>                  
+                </tr>
+                <% }) %>          
+
+
+        </tbody>
+    </table>
+
+</head>
+<body>
+    <h1>Hirak</h1>
+</body>
+</html>
+
+</head>
+<body>
+    <h1>Hirak</h1>
+</body>
+</html>
