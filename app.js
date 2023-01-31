@@ -15,6 +15,7 @@ app.set('view engine', 'ejs');
 // app.use(express.static(path.join(__dirname, 'public')));
 // DATABASE 
 // console.log(process.env.MongodbUrl)
+mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://127.0.0.1:27017/test')
   .then(() => console.log('Connected!'));
 
@@ -36,17 +37,20 @@ app.get('/', async (req, res) => {
 app.post('/createOrders',async (req,res)=>{
     try {
         let ITEM_NAME = req.body.item_name
-
-        let item = await InventorModel.find({item_name:ITEM_NAME})
-        console.log(item)
-        if(item.available_quantity > req.body.Quantity){
-            
+        console.log(ITEM_NAME)
+        let item = await InventorModel.find({item_name: ITEM_NAME})
+        // console.log(item[0]?.available_quantity)
+        // console.log(item[0]?.available_quantity,'item.available_quantity')
+        // console.log(req.body.Quantity,'req.body.Quantity')
+        if(item[0]?.available_quantity > req.body.Quantity){            
             let data = await OrderoModel.create({
                 coustomer_Id: req.body.coustomer_Id,
                 inventory_id: req.body.inventory_id,
                 item_name: req.body.item_name,
                 Quantity: req.body.Quantity
             })
+            let listUpdate = InventorModel.updateOne({item_name: ITEM_NAME},{available_quantity:item[0]?.available_quantity - req.body.Quantity })
+            console.log(listUpdate)
             res.json({
                 data,
                 status:"sucess"
