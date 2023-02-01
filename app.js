@@ -16,7 +16,7 @@ app.set('view engine', 'ejs');
 // DATABASE 
 // console.log(process.env.MongodbUrl)
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb://127.0.0.1:27017/test')
+mongoose.connect(process.env.MongodbUrl)
   .then(() => console.log('Connected!'));
 
 //mODELS
@@ -37,20 +37,24 @@ app.get('/', async (req, res) => {
 app.post('/createOrders',async (req,res)=>{
     try {
         let ITEM_NAME = req.body.item_name
-        console.log(ITEM_NAME)
+        // console.log(ITEM_NAME)
         let item = await InventorModel.find({item_name: ITEM_NAME})
         // console.log(item[0]?.available_quantity)
         // console.log(item[0]?.available_quantity,'item.available_quantity')
         // console.log(req.body.Quantity,'req.body.Quantity')
-        if(item[0]?.available_quantity > req.body.Quantity){            
+        // console.log(item[0]?.available_quantity - req.body.Quantity ,'available_quantity:item[0]?.available_quantity - req.body.Quantity ')
+        if(item[0]?.available_quantity >= req.body.Quantity){            
             let data = await OrderoModel.create({
                 coustomer_Id: req.body.coustomer_Id,
                 inventory_id: req.body.inventory_id,
                 item_name: req.body.item_name,
                 Quantity: req.body.Quantity
             })
-            let listUpdate = InventorModel.updateOne({item_name: ITEM_NAME},{available_quantity:item[0]?.available_quantity - req.body.Quantity })
-            console.log(listUpdate)
+            InventorModel.updateMany({item_name: ITEM_NAME} , {$set: {available_quantity:item[0]?.available_quantity - req.body.Quantity }}, (err)=>{
+                if(err) console.log(err)
+                else console.log('update sucess')
+            })
+        
             res.json({
                 data,
                 status:"sucess"
@@ -115,10 +119,6 @@ app.get('/orders',async (req,res)=>{
     try {
         console.log('/orderrs route ')
         let data = await OrderoModel.find()
-
-
-
-
     console.log(data)
         res.json({
             data,
@@ -135,14 +135,13 @@ app.get('/orders',async (req,res)=>{
 app.get('/inventory',async (req,res)=>{
     try {
         // console.log(req.body)
-        let data = await InventorModel.find({})
-    
+        let data = await InventorModel.find({})    
         res.json({
             data,
             status:"sucess"
         })
     } catch (error) {
-        res.json({
+        res.status(503).json({
             status:"failed",
             err: error
         })
@@ -166,6 +165,39 @@ app.get('/customerDetails',async (req,res)=>{
     }
 })
 //**************************** */
+
+app.get('/inventory/:inventoryType',async (req,res)=>{
+    try {
+        console.log(req.params.inventoryType)
+        let data = await InventorModel.find({inventory_type: req.params.inventoryType })    
+        res.json({
+            data,
+            status:"sucess"
+        })
+    } catch (error) {
+        res.status(503).json({
+            status:"failed",
+            err: error
+        })
+    }
+})
+
+app.get('/:itemName/:availableQuantity',async (req,res)=>{
+    try {
+        console.log(req.params.inventoryType)
+        let listUpdate = InventorModel.updateOne({item_name: req.params.itemName},{available_quantity:req.params.availableQuantity })
+        // let data = await InventorModel.find({inventory_type: req.params.inventoryType })    
+        res.json({
+            listUpdate,
+            status:"sucess"
+        })
+    } catch (error) {
+        res.status(503).json({
+            status:"failed",
+            err: error
+        })
+    }
+})
 // app.get('/:s',async (req,res)=>{
 //     try {
 //         // console.log(req.body)
