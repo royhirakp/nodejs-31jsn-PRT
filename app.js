@@ -55,18 +55,18 @@ app.post('/createOrders',async (req,res)=>{
                 else console.log('update sucess')
             })
         
-            res.json({
+            res.status(201).json({
                 data,
                 status:"sucess"
             })
         }else{
-            res.json({
+            res.status(204).json({
                 status:'item out of stock'
             })
         }
         
     } catch (error) {
-        res.json({
+        res.status(503).json({
             status:"failed",
             err: error
         })
@@ -77,17 +77,17 @@ app.post('/createInventory',async (req,res)=>{
     try {
         // console.log(req.body)
         let data = await InventorModel.create({
-            inventory_type: req.body.inventory_type,
-       item_name: req.body.item_name,
+        inventory_type: req.body.inventory_type,
+        item_name: req.body.item_name,
         available_quantity: req.body.available_quantity
         })
     
-        res.json({
+        res.status(201).json({
             data,
             status:"sucess"
         })
     } catch (error) {
-        res.json({
+        res.status(503).json({
             status:"failed",
             err: error
         })
@@ -96,18 +96,18 @@ app.post('/createInventory',async (req,res)=>{
 //************************** */
 app.post('/createCustomer',async (req,res)=>{
     try {
-        console.log(req.body)
+        // console.log(req.body)
         let data = await CoustmerModel.create({
             customer_Name: req.body.customer_Name,
             email: req.body.email,
         })
     
-        res.json({
+        res.status(201).json({
             data,
             status:"sucess"
         })
     } catch (error) {
-        res.json({
+        res.status(503).json({
             status:"failed",
             err: error
         })
@@ -117,7 +117,7 @@ app.post('/createCustomer',async (req,res)=>{
 //getRoute 
 app.get('/orders',async (req,res)=>{
     try {
-        console.log('/orderrs route ')
+        // console.log('/orderrs route ')
         let data = await OrderoModel.find()
     console.log(data)
         res.json({
@@ -125,7 +125,7 @@ app.get('/orders',async (req,res)=>{
             status:"sucess"
         })
     } catch (error) {
-        res.json({
+        res.status(503).json({
             status:"failed",
             err: error
         })
@@ -168,7 +168,7 @@ app.get('/customerDetails',async (req,res)=>{
 
 app.get('/inventory/:inventoryType',async (req,res)=>{
     try {
-        console.log(req.params.inventoryType)
+        // console.log(req.params.inventoryType)
         let data = await InventorModel.find({inventory_type: req.params.inventoryType })    
         res.json({
             data,
@@ -182,15 +182,21 @@ app.get('/inventory/:inventoryType',async (req,res)=>{
     }
 })
 
-app.get('/:itemName/:availableQuantity',async (req,res)=>{
+app.get('/:itemName/availableQuantity',async (req,res)=>{
     try {
-        console.log(req.params.inventoryType)
-        let listUpdate = InventorModel.updateOne({item_name: req.params.itemName},{available_quantity:req.params.availableQuantity })
-        // let data = await InventorModel.find({inventory_type: req.params.inventoryType })    
-        res.json({
-            listUpdate,
-            status:"sucess"
-        })
+        let data = await InventorModel.find({item_name: req.params.itemName})
+        if(data[0].available_quantity !== 0){
+            // console.log('if condition')
+            res.json({
+                available_quantity: data[0].available_quantity,
+                status:"sucess"
+            })
+        }else{
+            res.json({
+                available_quantity: "ITEM OUT OF STOCK",
+                status:"Failed"
+            })
+        }        
     } catch (error) {
         res.status(503).json({
             status:"failed",
@@ -213,6 +219,14 @@ app.get('/:itemName/:availableQuantity',async (req,res)=>{
 //         })
 //     }
 // })
+
+//BAD REQUEST
+app.use('*',(req, res)=>{
+    res.status(404).json({
+      status: 'Failed',
+      message: '404! not found'
+    })
+  })
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
